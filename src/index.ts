@@ -8,6 +8,7 @@ export default class Web3Service {
 
   public web3Instance!: Web3;
   public address!: string;
+  protected network!: network;
 
   protected pendingTransactions: string[] = [];
 
@@ -20,8 +21,9 @@ export default class Web3Service {
 
   private constructor() {}
 
-  public init(provider: string | null) {
+  public init(provider: string | null, network: network) {
     this.web3Instance = new Web3(provider);
+    this.network = network;
   }
 
   public async call<T extends string>(method: ContractMethod, ...args: any[]) {
@@ -88,7 +90,7 @@ export default class Web3Service {
         if (receipt.status === false) {
           revertReason = await this.getRevertReason(
             receipt.transactionHash,
-            "ropsten"
+            this.network
           );
         }
         this.pendingTransactions = this.pendingTransactions.filter(
